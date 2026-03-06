@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Propuesta — Sr. Reyes</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0e0e0e;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #b8943f;
+    --gold-light: #d4b06a;
+    --muted: #4a4438;
+    --rule: #c8bfa8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NAVIGATION DOTS */
+  .nav-dots {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--rule);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .nav-dot.active {
+    background: var(--gold);
+    transform: scale(1.6);
+  }
+
+  /* SLIDES */
+  .slide {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 4rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .slide.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .slide-inner {
+    max-width: 860px;
+    width: 100%;
+  }
+
+  /* SLIDE SEPARATORS */
+  .slide:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  /* SLIDE LABELS */
+  .slide-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .slide-label::after {
+    content: '';
+    flex: 0 0 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  /* COVER SLIDE */
+  .slide-cover {
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+  }
+  .slide-cover .slide-label {
+    color: var(--gold-light);
+  }
+  .slide-cover .slide-label::after {
+    background: var(--gold-light);
+  }
+
+  .cover-title {
+    font-size: clamp(3.5rem, 8vw, 6.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+  .cover-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .cover-subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #a09880;
+    max-width: 480px;
+    line-height: 1.7;
+    border-left: 1px solid var(--gold);
+    padding-left: 1.5rem;
+  }
+
+  .cover-meta {
+    margin-top: 4rem;
+    display: flex;
+    gap: 3rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    color: #6a6050;
+    text-transform: uppercase;
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+  .section-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .section-intro {
+    font-size: 1.5rem;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  /* DEFINITION BLOCK */
+  .definition {
+    border: 1px solid var(--rule);
+    padding: 2.5rem 3rem;
+    margin-top: 2.5rem;
+    position: relative;
+    background: rgba(255,255,255,0.4);
+  }
+  .definition::before {
+    content: '"';
+    font-size: 6rem;
+    color: var(--rule);
+    position: absolute;
+    top: -1rem;
+    left: 2rem;
+    line-height: 1;
+    font-family: 'Cormorant Garamond', serif;
+  }
+  .definition p {
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--ink);
+  }
+
+  /* TWO COLUMN FACTORS */
+  .factors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 2.5rem;
+  }
+  .factor-card {
+    background: var(--cream);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .factor-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--gold);
+  }
+  .factor-card h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+  }
+  .factor-card p {
+    font-size: 1.5rem;
+    color: var(--muted);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .factor-card .factor-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  /* PROCESS ITEMS */
+  .process-list {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5px;
+  }
+  .process-item {
+    background: var(--cream);
+    padding: 2rem 2.5rem;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+  .process-item-label {
+    font-size: 1.5rem;
+    font-weight: 400;
+    padding-top: 0.1rem;
+  }
+  .process-item-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 0.3rem;
+  }
+  .process-bullets {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .process-bullets li {
+    font-size: 1.5rem;
+    color: var(--muted);
+    font-weight: 300;
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .process-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--rule);
+    font-size: 0.8rem;
+  }
+
+  /* SOLUTION BLOCKS */
+  .solution-block {
+    margin-top: 2rem;
+    padding: 2rem 2.5rem;
+    background: var(--cream);
+    border-bottom: 1px solid var(--rule);
+  }
+  .solution-block:last-child { border-bottom: none; }
+  .solution-block h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+  }
+  .solution-block ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .solution-block li {
+    font-size: 1.5rem;
+    color: var(--muted);
+    font-weight: 300;
+    padding-left: 1.5rem;
+    position: relative;
+    line-height: 1.6;
+  }
+  .solution-block li::before {
+    content: '·';
+    position: absolute;
+    left: 0.4rem;
+    color: var(--gold);
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  .solution-block p {
+    font-size: 1.5rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* STAGES TIMELINE */
+  .stages {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5px;
+  }
+  .stage {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 0;
+    background: var(--cream);
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .stage:hover { background: #e8e1d2; }
+  .stage-number {
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.1em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    text-transform: uppercase;
+    padding: 1.5rem 0;
+    letter-spacing: 0.2em;
+  }
+  .stage-number.gold { background: var(--gold); color: var(--ink); }
+  .stage-content {
+    padding: 1.75rem 2rem;
+  }
+  .stage-content h3 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 0.6rem;
+  }
+  .stage-content ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+  }
+  .stage-content li {
+    font-size: 1.1rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+
+  /* CLOSING SLIDE */
+  .slide-closing {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .closing-title {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+  .closing-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .closing-note {
+    font-size: 1.5rem;
+    color: #8a8070;
+    max-width: 500px;
+    line-height: 1.8;
+    font-weight: 300;
+    font-style: italic;
+    border-left: 1px solid var(--gold);
+    padding-left: 1.5rem;
+  }
+
+  /* HORIZONTAL RULE DIVIDER */
+  .rule {
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    margin: 2rem 0;
+  }
+
+  /* OBJECTIVE METRIC */
+  .objective-box {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .obj-cell {
+    background: var(--cream);
+    padding: 2rem 2.5rem;
+  }
+  .obj-cell .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+  .obj-cell p {
+    font-size: 1.5rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .obj-cell.dark {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .obj-cell.dark .label { color: var(--gold-light); }
+  .obj-cell.dark p { color: #a09880; }
+
+  @media (max-width: 680px) {
+    .slide { padding: 4rem 2rem; }
+    .factors-grid { grid-template-columns: 1fr; }
+    .process-item { grid-template-columns: 1fr; gap: 0.5rem; }
+    .objective-box { grid-template-columns: 1fr; }
+    .nav-dots { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV DOTS -->
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- SLIDE 0: COVER -->
+<section class="slide slide-cover" data-label="Presentación">
+  <div class="slide-inner">
+    <div class="slide-label">Propuesta de desarrollo</div>
+    <h1 class="cover-title">
+      Despacho<br><em>inteligente.</em>
+    </h1>
+    <p class="cover-subtitle">
+      Una plataforma diseñada para aumentar la capacidad de atención de su despacho, reducir la carga operativa y mantener a sus clientes informados — sin esfuerzo adicional.
+    </p>
+    <div class="cover-meta">
+      <span>Sr. Reyes</span>
+      <span>Propuesta inicial</span>
+      <span>2026</span>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 1: ACLARACIÓN -->
+<section class="slide" data-label="Contexto">
+  <div class="slide-inner">
+    <div class="slide-label">Antes de comenzar</div>
+    <h2 class="section-title">Nada aquí<br>es <em>estático.</em></h2>
+    <div class="rule"></div>
+    <p class="section-intro">
+      Gran parte del proyecto consiste en materializar procesos existentes de su despacho. Necesitaré conversar con usted y sus hermanos para entender el estado actual. Una vez tengamos un concepto claro, definiremos los módulos exactos y podremos hacer una cotización.
+    </p>
+  </div>
+</section>
+
+<!-- SLIDE 2: OBJETIVO -->
+<section class="slide" data-label="Objetivo">
+  <div class="slide-inner">
+    <div class="slide-label">El objetivo</div>
+    <h2 class="section-title">Capacidad<br>de <em>clientes.</em></h2>
+    <div class="objective-box">
+      <div class="obj-cell">
+        <div class="label">La visión</div>
+        <p>El objetivo del sistema es aumentar la capacidad de un despacho para atender a múltiples clientes al mismo tiempo. Si logramos este objetivo con una métrica clara en su despacho, distribuir el software por todo el mundo será solo cuestión de marketing.</p>
+      </div>
+      <div class="obj-cell dark">
+        <div class="label">El plan</div>
+        <p>Si disminuimos los factores de carga operativa del abogado líder (usted), la capacidad de clientes podrá aumentar drásticamente.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 3: CARGA OPERATIVA -->
+<section class="slide" data-label="Carga operativa">
+  <div class="slide-inner">
+    <div class="slide-label">Definición central</div>
+    <h2 class="section-title">Carga<br><em>operativa.</em></h2>
+    <div class="definition">
+      <p>El esfuerzo y tiempo que deben invertirse para obtener un resultado favorable para el cliente y mantener una adecuada gestión de la relación con este.</p>
+    </div>
+    <div class="factors-grid">
+      <div class="factor-card">
+        <div class="factor-tag">Factor 01</div>
+        <h3>Tranquilidad</h3>
+        <p>Si hay poca comunicación, el cliente lo contactará innecesariamente. Un cliente tranquilo es un cliente en silencio. La tranquilidad se obtiene mediante actualizaciones automáticas y constantes.</p>
+      </div>
+      <div class="factor-card">
+        <div class="factor-tag">Factor 02</div>
+        <h3>Precisión</h3>
+        <p>La calidad necesaria para ganar un caso requiere investigación y análisis prolongados. El objetivo es distribuir esa carga entre los abogados y las herramientas disponibles de la mejor manera posible.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 4: PROCESOS -->
+<section class="slide" data-label="Procesos">
+  <div class="slide-inner">
+    <div class="slide-label">Contexto operativo</div>
+    <h2 class="section-title">Procesos<br>de <em>negocio.</em></h2>
+    <div class="process-list">
+      <div class="process-item">
+        <div>
+          <div class="process-item-label">Nuevo cliente</div>
+          <div class="process-item-tag">Precisión</div>
+        </div>
+        <ul class="process-bullets">
+          <li>Leer y analizar PDFs del caso</li>
+          <li>Sintetizar la información relevante</li>
+          <li>Formular una estrategia de argumentación</li>
+        </ul>
+      </div>
+      <div class="process-item">
+        <div>
+          <div class="process-item-label">Delegación de tareas</div>
+          <div class="process-item-tag">Precisión</div>
+        </div>
+        <ul class="process-bullets">
+          <li>Formular incidencias para delegar tareas</li>
+          <li>Atender dudas de abogados subordinados</li>
+          <li>Revisión de documentos redactados</li>
+        </ul>
+      </div>
+      <div class="process-item">
+        <div>
+          <div class="process-item-label">Atención al cliente</div>
+          <div class="process-item-tag">Tranquilidad · Ancho de Banda</div>
+        </div>
+        <ul class="process-bullets">
+          <li>Contestar preocupaciones de los clientes</li>
+          <li>Escuchar y registrar la problemática</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 5: MATERIALIZACIÓN -->
+<section class="slide" data-label="Materialización">
+  <div class="slide-inner">
+    <div class="slide-label">Concepto clave</div>
+    <h2 class="section-title"><em>Materialización.</em></h2>
+    <div class="definition">
+      <p>El proceso de convertir una idea o proceso abstracto — por ejemplo, la asignación de tareas a otros abogados del despacho — en algo tangible.</p>
+    </div>
+    <div class="rule"></div>
+    <p class="section-intro">Es la etapa más importante, ya que de ello depende qué tanto el sistema facilitará los procesos internos de un despacho.</p>
+  </div>
+</section>
+
+<!-- SLIDE 6: SOLUCIONES -->
+<section class="slide" data-label="Soluciones">
+  <div class="slide-inner">
+    <div class="slide-label">Propuestas de solución</div>
+    <h2 class="section-title">Cómo lo<br><em>resolvemos.</em></h2>
+
+    <div class="solution-block">
+      <h3>Interfaz de Casos — colaboración interna</h3>
+      <ul>
+        <li>Chat colaborativo por caso entre abogados del despacho</li>
+        <li>Adjuntar y categorizar PDFs por tipo de documento</li>
+        <li>Búsqueda de estrategias de argumentación con inteligencia artificial</li>
+        <li>Delegación de tareas dentro de la misma interfaz</li>
+      </ul>
+    </div>
+
+    <div class="solution-block">
+      <h3>Materialización de tareas — delegación clara</h3>
+      <p>Convertir la delegación abstracta en un proceso determinista: instrucciones clasificadas por tipo, que mejoran con cada caso trabajado en equipo. Mientras menos abstracta sea una tarea, más fácil es comunicarla.</p>
+    </div>
+
+    <div class="solution-block">
+      <h3>Portal del cliente — tranquilidad automática</h3>
+      <ul>
+        <li>Notificación automática por cada nuevo estatus del caso</li>
+        <li>Menú interactivo: etapas, tareas terminadas, pendientes y en proceso</li>
+        <li>Canal de comunicación directo con los abogados asignados</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 6: ETAPAS -->
+<section class="slide" data-label="Etapas">
+  <div class="slide-inner">
+    <div class="slide-label">Hoja de ruta</div>
+    <h2 class="section-title">Etapas de<br><em>desarrollo.</em></h2>
+    <div class="stages">
+      <div class="stage">
+        <div class="stage-number">Etapa 1</div>
+        <div class="stage-content">
+          <h3>Planeación</h3>
+          <ul>
+            <li>Abogado líder — perspectiva parcial ya obtenida</li>
+            <li>Abogados subordinados — necesidades y flujos por evaluar</li>
+            <li>Requisitos: dónde se necesita IA y materialización</li>
+            <li>Plataformas de interés (móvil, PWA, web, escritorio)</li>
+            <li>Selección de herramientas según plataformas elegidas</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-number">Etapa 2</div>
+        <div class="stage-content">
+          <h3>MVP — Materialización de procesos</h3>
+          <ul>
+            <li>Usuarios y roles: abogados</li>
+            <li>Casos · Documentos</li>
+            <li>Etapa del caso · Asignaciones</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-number">Etapa 3</div>
+        <div class="stage-content">
+          <h3>Tranquilidad del cliente</h3>
+          <ul>
+            <li>Usuarios y roles: clientes</li>
+            <li>Integración casos–clientes · Estatus del caso</li>
+            <li>Chat interactivo — interacción: actualización de estatus</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-number gold">Etapa 4</div>
+        <div class="stage-content">
+          <h3>Inteligencia artificial</h3>
+          <ul>
+            <li>Estrategias de argumentación</li>
+            <li>Sugerencia de asignaciones</li>
+            <li>Resumen automático de progreso</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-number">Etapa 5</div>
+        <div class="stage-content">
+          <h3>Distribución</h3>
+          <ul>
+            <li>Gestión de despachos</li>
+            <li>Modelo de cobro (suscripción vs. pago único)</li>
+            <li>Rol: administrador</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SLIDE 7: CIERRE -->
+<section class="slide slide-closing" data-label="Cierre">
+  <div class="slide-inner">
+    <div class="slide-label" style="color:var(--gold-light)">Siguiente paso</div>
+    <h2 class="closing-title">
+      Conversemos<br>sobre el <em>estado actual.</em>
+    </h2>
+    <div class="rule" style="background:var(--gold-light)"></div>
+    <p class="closing-note">
+      Necesitaré conversar con usted y sus hermanos para entender los flujos internos del despacho. Con esa información, podremos definir los módulos exactos y presentar una cotización formal.
+    </p>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const navDots = document.getElementById('navDots');
+
+  // Create nav dots
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    dot.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+    navDots.appendChild(dot);
+  });
+
+  const dots = document.querySelectorAll('.nav-dot');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const idx = Array.from(slides).indexOf(entry.target);
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[idx]) dots[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  slides.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
